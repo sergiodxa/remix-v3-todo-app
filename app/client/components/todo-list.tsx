@@ -1,7 +1,7 @@
 import type { Remix } from "@remix-run/dom";
 import type { Todo } from "../../shared/schemas/todo";
 import { events, dom } from "@remix-run/events";
-import Model from "../model";
+import TodosClient from "../clients/todos";
 import { press } from "@remix-run/events/press";
 import { App } from "./app";
 
@@ -10,31 +10,31 @@ export function TodoList(this: Remix.Handle) {
   let todos: Todo[] = [];
 
   events(model, [
-    Model.todosFetched((event) => {
+    TodosClient.todosFetched((event) => {
       todos = event.detail.todos;
       this.update();
     }),
 
-    Model.todosCreated((event) => {
+    TodosClient.todosCreated((event) => {
       todos.push(event.detail.todo);
       this.update();
     }),
 
-    Model.todoFetched((event) => {
+    TodosClient.todoFetched((event) => {
       let todo = todos.find((todo) => todo.id === event.detail.todo.id);
       if (todo) Object.assign(todo, event.detail.todo);
       else todos.push(event.detail.todo);
       this.update();
     }),
 
-    Model.todoUpdated((event) => {
+    TodosClient.todoUpdated((event) => {
       todos = todos.map((todo) =>
         todo.id === event.detail.todo.id ? event.detail.todo : todo,
       );
       this.update();
     }),
 
-    Model.todoDeleted((event) => {
+    TodosClient.todoDeleted((event) => {
       todos = todos.filter((todo) => todo.id !== event.detail.id);
       this.update();
     }),

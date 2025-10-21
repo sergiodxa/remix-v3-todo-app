@@ -1,6 +1,6 @@
 import { createEventType } from "@remix-run/events";
-import routes from "../shared/routes";
-import { TodoSchema, type Todo } from "../shared/schemas/todo";
+import routes from "../../shared/routes";
+import { TodoSchema, type Todo } from "../../shared/schemas/todo";
 
 const [todosFetched, createTodosFetched] = createEventType<{
   todos: Todo[];
@@ -21,7 +21,7 @@ const [todoUpdated, createTodoUpdated] = createEventType<{
 const [todoDeleted, createTodoDeleted] =
   createEventType<Pick<Todo, "id">>("todo:deleted");
 
-export default class Model extends EventTarget {
+export default class TodosClient extends EventTarget {
   constructor(protected signal: AbortSignal) {
     super();
   }
@@ -35,8 +35,10 @@ export default class Model extends EventTarget {
     let response = await fetch(routes.todos.index.href(), {
       signal: this.signal,
     });
+
     let body = await response.json();
     let todos = TodoSchema.array().parse(body);
+
     this.dispatchEvent(createTodosFetched({ detail: { todos } }));
   }
 
@@ -44,21 +46,26 @@ export default class Model extends EventTarget {
     let response = await fetch(routes.todos.show.href({ id }), {
       signal: this.signal,
     });
+
     let body = await response.json();
     let todo = TodoSchema.parse(body);
+
     this.dispatchEvent(createTodoFetched({ detail: { todo } }));
   }
 
   async create(title: string) {
     let formData = new FormData();
     formData.append("title", title);
+
     let response = await fetch(routes.todos.create.href(), {
       method: "POST",
       body: formData,
       signal: this.signal,
     });
+
     let body = await response.json();
     let todo = TodoSchema.parse(body.data);
+
     this.dispatchEvent(createTodosCreated({ detail: { todo } }));
   }
 
@@ -87,6 +94,7 @@ export default class Model extends EventTarget {
       method: "DELETE",
       signal: this.signal,
     });
+
     this.dispatchEvent(createTodoDeleted({ detail: { id } }));
   }
 

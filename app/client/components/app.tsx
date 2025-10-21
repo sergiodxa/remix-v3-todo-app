@@ -1,11 +1,11 @@
 import { type Remix } from "@remix-run/dom";
 import { press } from "@remix-run/events/press";
-import Model from "../model";
+import TodosClient from "../clients/todos";
 import { TodoForm } from "./todo-form";
 import { TodoList } from "./todo-list";
 
-export function App(this: Remix.Handle<Model>) {
-  const model = new Model(this.signal);
+export function App(this: Remix.Handle<TodosClient>) {
+  const model = new TodosClient(this.signal);
   this.context.set(model);
 
   this.queueTask(() => model.list());
