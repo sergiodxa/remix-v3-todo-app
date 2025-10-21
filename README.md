@@ -1,4 +1,8 @@
-# remix-v3-todo-app
+# Remix v3 Todo App
+
+This is a simple Remix v3 Todo application built with Bun.
+
+## How to Run
 
 To install dependencies:
 
