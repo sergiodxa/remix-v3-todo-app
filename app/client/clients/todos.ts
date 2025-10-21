@@ -26,13 +26,15 @@ export default class TodosClient extends EventTarget {
     super();
   }
 
-  fetch(id?: string) {
+  fetch(id?: string, q?: string) {
     if (id) return this.show(id);
-    return this.list();
+    return this.list(q);
   }
 
-  async list() {
-    let response = await fetch(routes.todos.index.href(), {
+  async list(q?: string) {
+    let href = routes.todos.index.href();
+    if (q && q.trim()) href += `?q=${encodeURIComponent(q.trim())}`;
+    let response = await fetch(href, {
       signal: this.signal,
     });
 

@@ -6,8 +6,9 @@ import z from "zod";
 export default {
   use: [],
   handlers: {
-    async index() {
-      let todos = await TodoModel.list();
+    async index({ url }) {
+      let q = new URL(url).searchParams.get("q") ?? undefined;
+      let todos = await TodoModel.list(q);
       return Response.json(todos);
     },
 
