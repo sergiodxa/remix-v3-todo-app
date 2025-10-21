@@ -7,9 +7,18 @@ export default {
   use: [],
   handlers: {
     async index({ url }) {
-      let q = new URL(url).searchParams.get("q") ?? undefined;
-      let todos = await TodoModel.list(q);
-      return Response.json(todos);
+      const searchParams = new URL(url).searchParams;
+      const q = searchParams.get("q") ?? undefined;
+      const page = parseInt(searchParams.get("page") ?? "1", 10);
+      const perPage = parseInt(searchParams.get("per_page") ?? "10", 10);
+
+      const { todos, count, pages } = await TodoModel.list(q, page, perPage);
+
+      const response = Response.json(todos);
+      response.headers.set("X-Total-Count", count.toString());
+      response.headers.set("X-Total-Pages", pages.toString());
+
+      return response;
     },
 
     async show({ params }) {

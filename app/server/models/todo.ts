@@ -17,14 +17,27 @@ export class TodoModel {
     return TodoSchema.array().parse(await TodoModel.file.json());
   }
 
-  static async list(filter?: string) {
+  private static paginate(todos: Todo[], page: number, perPage: number) {
+    return {
+      count: todos.length,
+      pages: Math.ceil(todos.length / perPage),
+      todos: todos.slice((page - 1) * perPage, page * perPage),
+    };
+  }
+
+  private static filter(todos: Todo[], query: string) {
+    if (query.trim().length === 0) return todos;
+    return matchSorter(todos, query.trim(), { keys: ["title"] });
+  }
+
+  static async list(filter?: string, page = 1, perPage = 10) {
     await TodoModel.ensure();
     let todos = await TodoModel.read();
-
-    let q = filter?.trim();
-    if (q) return matchSorter(todos, q, { keys: ["title"] });
-
-    return todos;
+    return TodoModel.paginate(
+      TodoModel.filter(todos, filter || ""),
+      page,
+      perPage,
+    );
   }
 
   static async show(id: string) {

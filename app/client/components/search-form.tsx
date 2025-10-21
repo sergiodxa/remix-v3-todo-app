@@ -1,5 +1,5 @@
 import type { Remix } from "@remix-run/dom";
-import { dom, submit } from "@remix-run/events";
+import { dom } from "@remix-run/events";
 import { App } from "./app";
 
 export function SearchForm(this: Remix.Handle) {
@@ -12,13 +12,18 @@ export function SearchForm(this: Remix.Handle) {
       class="flex items-center gap-2"
       method="GET"
       on={[
-        submit(async (formData) => {
+        dom.submit(async (event, signal) => {
+          event.preventDefault();
+
           status = "submitting";
           this.update();
 
-          let q = formData.get("q");
-          if (q) await model.list(q.toString().trim());
-          else await model.list();
+          let formData = new FormData(event.currentTarget);
+          let query = formData.get("q") as string;
+          await model.list(
+            { query: (query || "").trim(), page: 1, perPage: 10 },
+            signal,
+          );
 
           status = "idle";
           this.update();

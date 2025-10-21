@@ -1,6 +1,6 @@
 import { connect, type Remix } from "@remix-run/dom";
 import routes from "../../shared/routes";
-import { submit } from "@remix-run/events";
+import { dom } from "@remix-run/events";
 import { App } from "./app";
 
 export function TodoForm(this: Remix.Handle) {
@@ -15,12 +15,18 @@ export function TodoForm(this: Remix.Handle) {
       method="POST"
       action={routes.todos.create.href()}
       on={[
-        submit(async (formData) => {
+        dom.submit(async (event, signal) => {
+          event.preventDefault();
+
           status = "submitting";
           this.update();
-          await model.create(formData.get("title") as string);
+
+          let formData = new FormData(event.currentTarget);
+          await model.create(formData.get("title") as string, signal);
+
           $input.value = "";
           status = "idle";
+
           this.update();
         }),
       ]}
