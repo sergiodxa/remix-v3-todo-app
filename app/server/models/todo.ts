@@ -1,18 +1,38 @@
 import { TodoSchema, type Todo } from "../../shared/schemas/todo";
+import { matchSorter } from "match-sorter";
 
 export class TodoModel {
   static file = Bun.file("./todos.json");
 
-  static async list(): Promise<Todo[]> {
+  private static async ensure() {
+    if (await TodoModel.file.exists()) return;
+    await TodoModel.write([]);
+  }
+
+  private static write(content: Todo[]) {
+    return TodoModel.file.write(JSON.stringify(content, null, 2));
+  }
+
+  private static async read(): Promise<Todo[]> {
     return TodoSchema.array().parse(await TodoModel.file.json());
   }
 
-  static async show(id: string): Promise<Todo | null> {
-    let todos = await TodoModel.list();
+  static async list(filter?: string) {
+    await TodoModel.ensure();
+    let todos = await TodoModel.read();
+
+    let q = filter?.trim();
+    if (q) return matchSorter(todos, q, { keys: ["title"] });
+
+    return todos;
+  }
+
+  static async show(id: string) {
+    let todos = await TodoModel.read();
     return todos.find((todo) => todo.id === id) || null;
   }
 
-  static async create(input: Pick<Todo, "title">): Promise<Todo> {
+  static async create(input: Pick<Todo, "title">) {
     let timestamp = new Date();
 
     let todo = TodoSchema.parse({
@@ -23,18 +43,18 @@ export class TodoModel {
       updatedAt: timestamp.toISOString(),
     });
 
-    let todos = await TodoModel.list();
+    let todos = await TodoModel.read();
     todos.push(todo);
-    await TodoModel.file.write(JSON.stringify(todos, null, 2));
 
+    await TodoModel.write(todos);
     return todo;
   }
 
   static async update(
     id: string,
     input: Partial<Pick<Todo, "title" | "completedAt">>,
-  ): Promise<Todo | null> {
-    let todos = await TodoModel.list();
+  ) {
+    let todos = await TodoModel.read();
     let todoIndex = todos.findIndex((todo) => todo.id === id);
 
     let todo = todos.at(todoIndex);
@@ -48,17 +68,17 @@ export class TodoModel {
       updatedAt: new Date().toISOString(),
     });
 
-    await TodoModel.file.write(JSON.stringify(todos, null, 2));
+    await TodoModel.write(todos);
     return todos[todoIndex];
   }
 
-  static async destroy(id: string): Promise<boolean> {
-    let todos = await TodoModel.list();
+  static async destroy(id: string) {
+    let todos = await TodoModel.read();
     let todoIndex = todos.findIndex((todo) => todo.id === id);
     if (todoIndex === -1) return false;
 
     todos.splice(todoIndex, 1);
-    await TodoModel.file.write(JSON.stringify(todos, null, 2));
+    await TodoModel.write(todos);
 
     return true;
   }
