@@ -10,5 +10,4 @@ export const TodoSchema = z.object({
   updatedAt: z.iso.datetime(),
 });
 
-export type TodoInput = z.input<typeof TodoSchema>;
-export type TodoOutput = z.output<typeof TodoSchema>;
+export type Todo = z.infer<typeof TodoSchema>;

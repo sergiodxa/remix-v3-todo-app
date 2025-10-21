@@ -1,5 +1,5 @@
 import type { Remix } from "@remix-run/dom";
-import type { TodoOutput } from "../../shared/schemas/todo";
+import type { Todo } from "../../shared/schemas/todo";
 import { events, dom } from "@remix-run/events";
 import Model from "../model";
 import { press } from "@remix-run/events/press";
@@ -7,7 +7,7 @@ import { App } from "./app";
 
 export function TodoList(this: Remix.Handle) {
   const model = this.context.get(App);
-  let todos: TodoOutput[] = [];
+  let todos: Todo[] = [];
 
   events(model, [
     Model.todosFetched((event) => {

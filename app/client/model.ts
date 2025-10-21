@@ -1,25 +1,25 @@
 import { createEventType } from "@remix-run/events";
 import routes from "../shared/routes";
-import { TodoSchema, type TodoOutput } from "../shared/schemas/todo";
+import { TodoSchema, type Todo } from "../shared/schemas/todo";
 
 const [todosFetched, createTodosFetched] = createEventType<{
-  todos: TodoOutput[];
+  todos: Todo[];
 }>("todos:fetched");
 
 const [todosCreated, createTodosCreated] = createEventType<{
-  todo: TodoOutput;
+  todo: Todo;
 }>("todos:created");
 
 const [todoFetched, createTodoFetched] = createEventType<{
-  todo: TodoOutput;
+  todo: Todo;
 }>("todo:fetched");
 
 const [todoUpdated, createTodoUpdated] = createEventType<{
-  todo: TodoOutput;
+  todo: Todo;
 }>("todo:updated");
 
 const [todoDeleted, createTodoDeleted] =
-  createEventType<Pick<TodoOutput, "id">>("todo:deleted");
+  createEventType<Pick<Todo, "id">>("todo:deleted");
 
 export default class Model extends EventTarget {
   constructor(protected signal: AbortSignal) {
@@ -62,10 +62,7 @@ export default class Model extends EventTarget {
     this.dispatchEvent(createTodosCreated({ detail: { todo } }));
   }
 
-  async update(
-    id: string,
-    data: Partial<Pick<TodoOutput, "title" | "completedAt">>,
-  ) {
+  async update(id: string, data: Partial<Pick<Todo, "title" | "completedAt">>) {
     let formData = new FormData();
     if (data.title) formData.append("title", data.title);
 
