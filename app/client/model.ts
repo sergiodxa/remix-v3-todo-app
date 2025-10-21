@@ -1,6 +1,6 @@
 import { createEventType } from "@remix-run/events";
 import routes from "../shared/routes";
-import { TodoSchema, type TodoOutput } from "../shared/todo";
+import { TodoSchema, type TodoOutput } from "../shared/schemas/todo";
 
 const [todosFetched, createTodosFetched] = createEventType<{
   todos: TodoOutput[];

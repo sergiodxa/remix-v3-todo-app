@@ -1,4 +1,4 @@
-import { TodoSchema, type TodoOutput } from "../../shared/todo";
+import { TodoSchema, type TodoOutput } from "../../shared/schemas/todo";
 
 export class Todo {
   static file = Bun.file("./todos.json");

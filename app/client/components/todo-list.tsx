@@ -1,5 +1,5 @@
 import type { Remix } from "@remix-run/dom";
-import type { TodoOutput } from "../../shared/todo";
+import type { TodoOutput } from "../../shared/schemas/todo";
 import { events, dom } from "@remix-run/events";
 import Model from "../model";
 import { press } from "@remix-run/events/press";
