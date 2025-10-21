@@ -39,6 +39,7 @@ export function TodoList(this: Remix.Handle) {
     TodosClient.todoDeleted((event) => {
       todos = todos.filter((todo) => todo.id !== event.detail.id);
       this.update();
+      model.list({ page, perPage: 10 });
     }),
 
     TodosClient.paginationInfo((event) => {
