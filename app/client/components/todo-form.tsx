@@ -5,6 +5,7 @@ import { App } from "./app";
 
 export function TodoForm(this: Remix.Handle) {
   const model = this.context.get(App);
+
   let status: "idle" | "submitting" = "idle";
   let $input: HTMLInputElement;
 
@@ -17,9 +18,10 @@ export function TodoForm(this: Remix.Handle) {
         submit(async (formData) => {
           status = "submitting";
           this.update();
-          model.create(formData.get("title") as string);
+          await model.create(formData.get("title") as string);
           $input.value = "";
           status = "idle";
+          this.update();
         }),
       ]}
     >
